@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 
 const theme = createTheme()
 
-export default function SignIn() {
+export default function SignUp() {
     const handleSubmit = (event: any) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
@@ -18,6 +18,7 @@ export default function SignIn() {
         console.log({
             email: data.get('email'),
             password: data.get('password'),
+            confirmPassword: data.get('confirmpassword'),
         })
     }
 
@@ -35,7 +36,7 @@ export default function SignIn() {
                 >
                     <img src={EdgecomIcon} width={24} height={28} />
                     <Typography component="h1" variant="h5">
-                        Sign in
+                        Sign Up
                     </Typography>
                     <Box
                         component="form"
@@ -63,6 +64,16 @@ export default function SignIn() {
                             id="password"
                             autoComplete="current-password"
                         />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="confirmpassword"
+                            label="Confirm Password"
+                            type="password"
+                            id="confirmpassword"
+                            autoComplete="current-password"
+                        />
                         <Button
                             type="submit"
                             fullWidth
@@ -78,8 +89,8 @@ export default function SignIn() {
                                 alignItems: 'center',
                             }}
                         >
-                            {"Don't have an account? "} &nbsp;
-                            <Link to="/signUp">Register</Link>
+                            {'Already have an account?'} &nbsp;
+                            <Link to="/login">Login</Link>
                         </Box>
                     </Box>
                 </Box>

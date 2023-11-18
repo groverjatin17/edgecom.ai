@@ -6,13 +6,24 @@ import reportWebVitals from './reportWebVitals'
 import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ErrorPage from './pages/errorPage'
-// import Edit from "./pages/EditPokemon";
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: '/login',
+        element: <SignIn />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: '/signUp',
+        element: <SignUp />,
         errorElement: <ErrorPage />,
     },
 ])
