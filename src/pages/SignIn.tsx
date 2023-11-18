@@ -1,28 +1,52 @@
-import Button from '@mui/material/Button'
-import CssBaseline from '@mui/material/CssBaseline'
-import TextField from '@mui/material/TextField'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import EdgecomIcon from '../assets/icons/edgecom.svg'
-import { Link } from 'react-router-dom'
-
-const theme = createTheme()
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import EdgecomIcon from '../assets/icons/edgecom.svg';
+import { Link, useNavigate } from 'react-router-dom';
+import { useApi } from '../hooks/useLoginUser';
+import { IUser } from '../types';
+import { useDispatch } from 'react-redux';
+import { toggleUserStatus } from '../redux/mainSlice';
+import { Backdrop, CircularProgress } from '@mui/material';
+import LoadingBackdrop from '../components/LoadingBackdrop';
+const theme = createTheme();
 
 export default function SignIn() {
+    const {
+        data: listOfUsers,
+        isLoading,
+        error,
+    } = useApi<Array<IUser>>('http://localhost:8000/users', {
+        method: 'GET',
+    });
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    if (error) console.error('There was an Error');
     const handleSubmit = (event: any) => {
-        event.preventDefault()
-        const data = new FormData(event.currentTarget)
-        // eslint-disable-next-line no-console
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        })
-    }
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        //TODO: Technically the logic of whether the username is present should be in backend.
+        //We will just mock the login functionality just for the sake of it.
+
+        const currentUser = listOfUsers?.find(
+            (user) => user.email === data.get('email')
+        );
+
+        if (currentUser?.password === data.get('password')) {
+            dispatch(toggleUserStatus());
+            navigate('/');
+        }
+    };
 
     return (
         <ThemeProvider theme={theme}>
+            <LoadingBackdrop isOpen={isLoading} />
+
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box
@@ -85,5 +109,5 @@ export default function SignIn() {
                 </Box>
             </Container>
         </ThemeProvider>
-    )
+    );
 }
