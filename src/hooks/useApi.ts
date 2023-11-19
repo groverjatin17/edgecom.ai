@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-export const useApi = <T>(url: string, options?: AxiosRequestConfig) => {
+export const useApi = <T>() => {
     const [data, setData] = useState<T | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchData = async () => {
+    const fetchData = async (url: string, options?: AxiosRequestConfig) => {
         setIsLoading(true);
         try {
             const response: AxiosResponse<T> = await axios(url, options);
@@ -17,9 +17,5 @@ export const useApi = <T>(url: string, options?: AxiosRequestConfig) => {
         setIsLoading(false);
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    return { data, isLoading, error };
+    return { data, isLoading, error, fetchData };
 };

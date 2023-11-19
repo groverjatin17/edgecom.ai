@@ -6,20 +6,64 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import EdgecomIcon from '../assets/icons/edgecom.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toggleUserStatus } from '../redux/mainSlice';
+import { useDispatch } from 'react-redux';
+import { useApi } from '../hooks/useApi';
+import { IUser } from '../types';
+import { CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const theme = createTheme();
 
 export default function SignUp() {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { data: response, isLoading, error, fetchData } = useApi<IUser>();
+    const {
+        data: listOfUsers,
+        isLoading: getUserIsLoading,
+        error: getUserError,
+        fetchData: getUserData,
+    } = useApi<Array<IUser>>();
+
+    useEffect(() => {
+        getUserData('http://localhost:8000/users', {
+            method: 'GET',
+        });
+    }, []);
+
     const handleSubmit = (event: any) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        // eslint-disable-next-line no-console
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-            confirmPassword: data.get('confirmpassword'),
-        });
+        const user = listOfUsers?.find(
+            (user: IUser) => user.email === data.get('email')
+        );
+        console.log('🚀 ~ file: SignUp.tsx:43 ~ handleSubmit ~ user:', user);
+
+        if (user)
+            toast.warn('User is already registered, Please Login Instead', {
+                position: toast.POSITION.TOP_CENTER,
+            });
+        if (data.get('password') === data.get('confirmpassword')) {
+            fetchData('http://localhost:8000/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                data: {
+                    email: data.get('email'),
+                    password: data.get('password'),
+                    id: Math.floor(Math.random() * 10),
+                },
+            })
+                .then(() => {
+                    dispatch(toggleUserStatus());
+                    navigate('/');
+                })
+                .catch((error) => console.log('error', error));
+        }
     };
 
     return (
@@ -80,7 +124,16 @@ export default function SignUp() {
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                         >
-                            Sign Up
+                            {isLoading ? (
+                                <CircularProgress />
+                            ) : (
+                                <Typography
+                                    component="p"
+                                    sx={{ fontSize: '14px', fontWeight: 500 }}
+                                >
+                                    Sign Up
+                                </Typography>
+                            )}
                         </Button>
                         <Box
                             sx={{

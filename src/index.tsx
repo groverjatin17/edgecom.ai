@@ -9,6 +9,8 @@ import ErrorPage from './pages/errorPage';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import store from './redux/store';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -34,6 +36,7 @@ const router = createBrowserRouter([
 root.render(
     <Provider store={store}>
         <RouterProvider router={router} />
+        <ToastContainer />
     </Provider>
 );
 

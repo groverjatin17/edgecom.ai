@@ -7,22 +7,22 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import EdgecomIcon from '../assets/icons/edgecom.svg';
 import { Link, useNavigate } from 'react-router-dom';
-import { useApi } from '../hooks/useLoginUser';
+import { useApi } from '../hooks/useApi';
 import { IUser } from '../types';
 import { useDispatch } from 'react-redux';
 import { toggleUserStatus } from '../redux/mainSlice';
-import { Backdrop, CircularProgress } from '@mui/material';
 import LoadingBackdrop from '../components/LoadingBackdrop';
+import { useEffect } from 'react';
 const theme = createTheme();
 
 export default function SignIn() {
-    const {
-        data: listOfUsers,
-        isLoading,
-        error,
-    } = useApi<Array<IUser>>('http://localhost:8000/users', {
-        method: 'GET',
-    });
+    const { data: listOfUsers, isLoading, error, fetchData } = useApi<Array<IUser>>();
+
+    useEffect(() => {
+        fetchData('http://localhost:8000/users', {
+            method: 'GET',
+        });
+    }, []);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function SignIn() {
         //We will just mock the login functionality just for the sake of it.
 
         const currentUser = listOfUsers?.find(
-            (user) => user.email === data.get('email')
+            (user: IUser) => user.email === data.get('email')
         );
 
         if (currentUser?.password === data.get('password')) {

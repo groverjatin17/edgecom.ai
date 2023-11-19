@@ -1,8 +1,29 @@
 {
-    "users": [
-        {
-            "email": "sam.altman@gmail.com",
-            "password": "IlikeChips"
-        }
-    ]
+  "users": [
+    {
+      "id": 1,
+      "email": "sam.altman@gmail.com",
+      "password": "IlikeChips"
+    },
+    {
+      "email": "groverjatin17@gmail.com",
+      "password": "A",
+      "id": 2
+    },
+    {
+      "email": "groverjatin17@gmail.com",
+      "password": "A",
+      "id": 3
+    },
+    {
+      "email": "asfsadf@gmail.com",
+      "password": "a",
+      "id": 5
+    },
+    {
+      "email": "asfsadf@gmail.com",
+      "password": "a",
+      "id": 4
+    }
+  ]
 }
