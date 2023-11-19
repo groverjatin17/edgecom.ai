@@ -14,17 +14,22 @@ import { IUser } from '../types';
 import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 
 const theme = createTheme();
+type FormValues = {
+    email: string;
+    password: string;
+    confirmpassword: string;
+};
 
 export default function SignUp() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { control, handleSubmit } = useForm<FormValues>();
     const { data: response, isLoading, error, fetchData } = useApi<IUser>();
     const {
         data: listOfUsers,
-        isLoading: getUserIsLoading,
-        error: getUserError,
         fetchData: getUserData,
     } = useApi<Array<IUser>>();
 
@@ -34,28 +39,28 @@ export default function SignUp() {
         });
     }, []);
 
-    const handleSubmit = (event: any) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
+    const onSubmit = (data: FieldValues) => {
+        console.log('🚀 ~ file: SignUp.tsx:69 ~ onSubmit ~ data:', data);
+
         const user = listOfUsers?.find(
-            (user: IUser) => user.email === data.get('email')
+            (user: IUser) => user.email === data.email
         );
-        console.log('🚀 ~ file: SignUp.tsx:43 ~ handleSubmit ~ user:', user);
 
         if (user)
             toast.warn('User is already registered, Please Login Instead', {
                 position: toast.POSITION.TOP_CENTER,
             });
-        if (data.get('password') === data.get('confirmpassword')) {
+            
+        if (data.password === data.confirmpassword) {
             fetchData('http://localhost:8000/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 data: {
-                    email: data.get('email'),
-                    password: data.get('password'),
-                    id: Math.floor(Math.random() * 10),
+                    email: data.email,
+                    password: data.password,
+                    id: Math.floor(Math.random() * 100),
                 },
             })
                 .then(() => {
@@ -65,7 +70,6 @@ export default function SignUp() {
                 .catch((error) => console.log('error', error));
         }
     };
-
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
@@ -84,39 +88,82 @@ export default function SignUp() {
                     </Typography>
                     <Box
                         component="form"
-                        onSubmit={handleSubmit}
+                        onSubmit={handleSubmit(onSubmit)}
                         noValidate
                         sx={{ mt: 1 }}
                     >
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
+                        <Controller
                             name="email"
-                            autoComplete="email"
-                            autoFocus
+                            control={control}
+                            rules={{
+                                required: 'Email is required',
+                                pattern: {
+                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i,
+                                    message: 'Please enter valid email',
+                                },
+                            }}
+                            defaultValue=""
+                            render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                            }) => (
+                                <TextField
+                                    helperText={error ? error.message : null}
+                                    error={!!error}
+                                    onChange={onChange}
+                                    value={value}
+                                    margin="normal"
+                                    fullWidth
+                                    label="Email Address"
+                                    autoFocus
+                                />
+                            )}
                         />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
+                        <Controller
                             name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                                required: 'Password is required',
+                            }}
+                            render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                            }) => (
+                                <TextField
+                                    helperText={error ? error.message : null}
+                                    error={!!error}
+                                    margin="normal"
+                                    fullWidth
+                                    label="Password"
+                                    onChange={onChange}
+                                    value={value}
+                                    type="password"
+                                />
+                            )}
                         />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
+                        <Controller
                             name="confirmpassword"
-                            label="Confirm Password"
-                            type="password"
-                            id="confirmpassword"
-                            autoComplete="current-password"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                                required: 'Password is required',
+                            }}
+                            render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                            }) => (
+                                <TextField
+                                    helperText={error ? error.message : null}
+                                    error={!!error}
+                                    margin="normal"
+                                    fullWidth
+                                    label="Confirm Password"
+                                    onChange={onChange}
+                                    value={value}
+                                    type="password"
+                                />
+                            )}
                         />
                         <Button
                             type="submit"

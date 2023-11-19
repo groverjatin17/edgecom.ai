@@ -13,10 +13,25 @@ import { useDispatch } from 'react-redux';
 import { toggleUserStatus } from '../redux/mainSlice';
 import LoadingBackdrop from '../components/LoadingBackdrop';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+
 const theme = createTheme();
 
+type FormValues = {
+    email: string;
+    password: string;
+};
 export default function SignIn() {
-    const { data: listOfUsers, isLoading, error, fetchData } = useApi<Array<IUser>>();
+    const {
+        data: listOfUsers,
+        isLoading,
+        error,
+        fetchData,
+    } = useApi<Array<IUser>>();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { control, handleSubmit } = useForm<FormValues>();
 
     useEffect(() => {
         fetchData('http://localhost:8000/users', {
@@ -24,22 +39,27 @@ export default function SignIn() {
         });
     }, []);
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    if (error) console.error('There was an Error');
-    const handleSubmit = (event: any) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
+    const onSubmit = (data: FieldValues) => {
         //TODO: Technically the logic of whether the username is present should be in backend.
         //We will just mock the login functionality just for the sake of it.
 
         const currentUser = listOfUsers?.find(
-            (user: IUser) => user.email === data.get('email')
+            (user: IUser) => user.email === data.email
         );
-
-        if (currentUser?.password === data.get('password')) {
+        if (!currentUser) {
+            toast.warn('Email not found, Please check again', {
+                position: toast.POSITION.TOP_CENTER,
+                toastId: 1,
+            });
+        }
+        if (currentUser?.password === data.password) {
             dispatch(toggleUserStatus());
             navigate('/');
+        } else {
+            toast.warn('Please enter a valid password to login', {
+                position: toast.POSITION.TOP_CENTER,
+                toastId: 1,
+            });
         }
     };
 
@@ -61,31 +81,56 @@ export default function SignIn() {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <Box
-                        component="form"
-                        onSubmit={handleSubmit}
-                        noValidate
-                        sx={{ mt: 1 }}
-                    >
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
+                    <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+                        <Controller
                             name="email"
-                            autoComplete="email"
-                            autoFocus
+                            control={control}
+                            rules={{
+                                required: 'Email is required',
+                                pattern: {
+                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i,
+                                    message: 'Please enter valid email',
+                                },
+                            }}
+                            defaultValue=""
+                            render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                            }) => (
+                                <TextField
+                                    helperText={error ? error.message : null}
+                                    error={!!error}
+                                    onChange={onChange}
+                                    value={value}
+                                    margin="normal"
+                                    fullWidth
+                                    label="Email Address"
+                                    autoFocus
+                                />
+                            )}
                         />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
+                        <Controller
                             name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                                required: 'Password is required',
+                            }}
+                            render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                            }) => (
+                                <TextField
+                                    helperText={error ? error.message : null}
+                                    error={!!error}
+                                    margin="normal"
+                                    fullWidth
+                                    label="Password"
+                                    onChange={onChange}
+                                    value={value}
+                                    type="password"
+                                />
+                            )}
                         />
                         <Button
                             type="submit"

@@ -9,7 +9,7 @@ import ErrorPage from './pages/errorPage';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import store from './redux/store';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const root = ReactDOM.createRoot(
