@@ -45,9 +45,16 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
     const allPokemons = useSelector(
         (state: RootState) => state.pokemonReducer.allPokemons
     );
-    const pokemonlist: any = allPokemons.find(
+    const pokemonlist: PokemonApiResponse[] | undefined = allPokemons.find(
         (item) => item.page === Number(currentPage)
     )?.data;
+    const searchString = useSelector(
+        (state: RootState) => state.pokemonReducer.searchString
+    );
+
+    const formatPokemons = pokemonlist?.filter((pokemon) =>
+        pokemon.name.includes(searchString)
+    );
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -108,7 +115,7 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                                       </TableRow>
                                   )
                               )
-                            : pokemonlist?.map((row: PokemonApiResponse) => (
+                            : formatPokemons?.map((row: PokemonApiResponse) => (
                                   <TableRow key={row.id}>
                                       <Cell component="th" scope="row">
                                           {row.id}
