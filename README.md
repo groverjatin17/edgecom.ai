@@ -23,7 +23,7 @@ For other use cases I have used Pokemon API
 
 ## How to run the project
 
-Clone the repository.
+- Clone the repository.
 - Run ```npm install``` to install all the respective dependencies
 - Run ```npm run dev```
 - go to [Edgecom Pokedex](http://localhost:3000/)
