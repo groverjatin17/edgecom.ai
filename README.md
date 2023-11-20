@@ -18,7 +18,7 @@ We can edit a pokemon details or delete a pokemon as well.
 ## How to run the project
 
 Clone the repository.
-Run ```npm install``` to install all the respective dependencies
-Run ```npm run dev```
-go to [Edgecom Pokedex]((http://localhost:3000/)http://localhost:3000/)
-:)
+- Run ```npm install``` to install all the respective dependencies
+- Run ```npm run dev```
+- go to [Edgecom Pokedex](http://localhost:3000/)
+- :)
