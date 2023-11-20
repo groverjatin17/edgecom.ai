@@ -13,7 +13,10 @@ import { Avatar, Chip, Skeleton, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 import DeletePokemon from '../pages/DeletePokemon';
 import Button from '@mui/material/Button';
-import { styled } from '@mui/system';
+import { Box, styled } from '@mui/system';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import _ from 'lodash';
 
 const fetchAbilities = (abilities: Ability[]) => {
     return abilities.map((item: Ability) => (
@@ -35,30 +38,53 @@ const Cell = styled(TableCell)({
 });
 
 export default function PokemonTable({ loading }: { loading: boolean }) {
-    const [deletePokemon, setDeletePokemon] = React.useState(0);
     const currentPage = useSelector(
         (state: RootState) => state.pokemonReducer.currentPage
-    );
-    const pageSize = useSelector(
-        (state: RootState) => state.pokemonReducer.pageSize
     );
     const allPokemons = useSelector(
         (state: RootState) => state.pokemonReducer.allPokemons
     );
+
     const pokemonlist: PokemonApiResponse[] | undefined = allPokemons.find(
         (item) => item.page === Number(currentPage)
     )?.data;
-    const searchString = useSelector(
-        (state: RootState) => state.pokemonReducer.searchString
-    );
 
-    const formatPokemons = pokemonlist?.filter((pokemon) =>
-        pokemon.name.includes(searchString)
-    );
+    const [deletePokemon, setDeletePokemon] = React.useState(0);
+    const [listOfPokemon, setListOfPokemon] = React.useState(pokemonlist);
+    const [sortingOrder, setSortingOrder] = React.useState('asc');
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const pageSize = useSelector(
+        (state: RootState) => state.pokemonReducer.pageSize
+    );
+
+    const searchString = useSelector(
+        (state: RootState) => state.pokemonReducer.searchString
+    );
+
+    React.useEffect(() => {
+        let formatPokemons = pokemonlist?.filter((pokemon) =>
+            pokemon.name.includes(searchString)
+        );
+        setListOfPokemon(formatPokemons);
+    }, [searchString, pokemonlist]);
+
+    React.useEffect(() => {
+        const isAsc = sortingOrder === 'asc';
+
+        let tempPokemons = _.cloneDeep(listOfPokemon);
+        const sortedPokemons = isAsc
+            ? tempPokemons?.sort((a, b) => a.weight - b.weight)
+            : tempPokemons?.sort((a, b) => b.weight - a.weight);
+        setListOfPokemon(sortedPokemons);
+    }, [sortingOrder]);
+
+    const sortIt = () => {
+        const isAsc = sortingOrder === 'asc';
+        setSortingOrder(isAsc ? 'desc' : 'asc');
+    };
 
     return (
         <React.Fragment>
@@ -78,12 +104,32 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                             <TableHeaderCell align="center">
                                 Name
                             </TableHeaderCell>
-                            <TableHeaderCell align="center">
-                                Weight
+                            <TableHeaderCell
+                                align="center"
+                                sx={{
+                                    '&:hover': {
+                                        cursor: 'pointer',
+                                    },
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                }}
+                            >
+                                Weight{' '}
+                                <Box
+                                    component="span"
+                                    onClick={sortIt}
+                                    sx={{ display: 'flex' }}
+                                >
+                                    {sortingOrder === 'asc' ? (
+                                        <ArrowUpwardIcon />
+                                    ) : (
+                                        <ArrowDownwardIcon />
+                                    )}
+                                </Box>
                             </TableHeaderCell>
-                            <TableHeaderCell align="center">
-                                Abilities
-                            </TableHeaderCell>
+                            <TableHeaderCell>Abilities</TableHeaderCell>
                             <TableHeaderCell align="center">
                                 Edit
                             </TableHeaderCell>
@@ -115,7 +161,7 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                                       </TableRow>
                                   )
                               )
-                            : formatPokemons?.map((row: PokemonApiResponse) => (
+                            : listOfPokemon?.map((row: PokemonApiResponse) => (
                                   <TableRow key={row.id}>
                                       <Cell component="th" scope="row">
                                           {row.id}
