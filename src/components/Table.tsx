@@ -150,7 +150,11 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                                               { length: 7 },
                                               (x, i) => i
                                           ).map((row) => (
-                                              <Cell component="th" scope="row">
+                                              <Cell
+                                                  component="th"
+                                                  scope="row"
+                                                  key={row}
+                                              >
                                                   <Skeleton
                                                       variant="rectangular"
                                                       width="100%"
