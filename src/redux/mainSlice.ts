@@ -1,12 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface mainSliceState {
-    currentPage: number;
     isUserAuthenticated: boolean;
 }
 
 const initialMainState: mainSliceState = {
-    currentPage: 0,
     isUserAuthenticated: false,
 };
 

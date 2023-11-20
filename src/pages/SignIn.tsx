@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import EdgecomIcon from '../assets/icons/edgecom.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApi } from '../hooks/useApi';
-import { IUser } from '../types';
+import { IUser } from '../types/userTypes';
 import { useDispatch } from 'react-redux';
 import { toggleUserStatus } from '../redux/mainSlice';
 import LoadingBackdrop from '../components/LoadingBackdrop';
@@ -46,10 +46,11 @@ export default function SignIn() {
         const currentUser = listOfUsers?.find(
             (user: IUser) => user.email === data.email
         );
+
         if (!currentUser) {
             toast.warn('Email not found, Please check again', {
                 position: toast.POSITION.TOP_CENTER,
-                toastId: 1,
+                toastId: 2,
             });
         }
         if (currentUser?.password === data.password) {

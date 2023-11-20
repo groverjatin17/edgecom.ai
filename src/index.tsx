@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -11,6 +10,8 @@ import SignUp from './pages/SignUp';
 import store from './redux/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EditPokemon from './pages/EditPokemon';
+import AddPokemon from './pages/AddPokemon';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -30,6 +31,14 @@ const router = createBrowserRouter([
         path: '/signUp',
         element: <SignUp />,
         errorElement: <ErrorPage />,
+    },
+    {
+        path: 'editPokemon/:pokemonId',
+        element: <EditPokemon />,
+    },
+    {
+        path: 'addPokemon',
+        element: <AddPokemon />,
     },
 ]);
 

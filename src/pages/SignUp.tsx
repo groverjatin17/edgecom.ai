@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toggleUserStatus } from '../redux/mainSlice';
 import { useDispatch } from 'react-redux';
 import { useApi } from '../hooks/useApi';
-import { IUser } from '../types';
+import { IUser } from '../types/userTypes';
 import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -40,8 +40,6 @@ export default function SignUp() {
     }, []);
 
     const onSubmit = (data: FieldValues) => {
-        console.log('🚀 ~ file: SignUp.tsx:69 ~ onSubmit ~ data:', data);
-
         const user = listOfUsers?.find(
             (user: IUser) => user.email === data.email
         );
@@ -50,7 +48,7 @@ export default function SignUp() {
             toast.warn('User is already registered, Please Login Instead', {
                 position: toast.POSITION.TOP_CENTER,
             });
-            
+
         if (data.password === data.confirmpassword) {
             fetchData('http://localhost:8000/users', {
                 method: 'POST',
