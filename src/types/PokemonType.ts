@@ -75,10 +75,6 @@ export interface AllPokemonResponse {
   results: PokemonType[];
 }
 
-export interface IlistOfPokemons {
-  page: number;
-  data: PokemonApiResponse[];
-}
 
 export interface PokemonApiResponse {
   abilities: Ability[];

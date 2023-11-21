@@ -29,18 +29,11 @@ export default function BasicModal({
 }) {
     const dispatch = useDispatch();
 
-    const currentPage = useSelector(
-        (state: RootState) => state.pokemonReducer.currentPage
-    );
-    const allPokemons = useSelector(
-        (state: RootState) => state.pokemonReducer.allPokemons
+    const { allPokemons } = useSelector(
+        (state: RootState) => state.pokemonReducer
     );
 
-    const pokemonlist: any = allPokemons.find(
-        (item) => item.page === Number(currentPage)
-    )?.data;
-
-    const pokemon: any = pokemonlist?.find(
+    const pokemon: any = allPokemons?.find(
         (pokemon: PokemonApiResponse) => pokemon.id === Number(deletePokemon)
     );
     const isMobile = window.innerWidth < 786;

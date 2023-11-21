@@ -1,20 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IlistOfPokemons, PokemonApiResponse } from '../types/PokemonType';
+import { PokemonApiResponse } from '../types/PokemonType';
 import _ from 'lodash';
 
 interface PokemonState {
     currentPage: number;
     pageSize: number;
     searchString: string;
-    pokemonList: PokemonApiResponse[];
-    allPokemons: IlistOfPokemons[];
+    allPokemons: PokemonApiResponse[];
 }
 
 const initialPokemonState: PokemonState = {
-    currentPage: 0,
+    currentPage: 1,
     pageSize: 5,
     searchString: '',
-    pokemonList: [],
     allPokemons: [],
 };
 
@@ -31,50 +29,53 @@ export const pokemonSlice = createSlice({
         setSearchString: (state, action: PayloadAction<string>) => {
             state.searchString = action.payload;
         },
-        listOfPokemons: (state, action: PayloadAction<IlistOfPokemons>) => {
-            const tempData = _.cloneDeep(state.allPokemons);
-            state.allPokemons = [...tempData, action.payload];
+        listOfPokemons: (
+            state,
+            action: PayloadAction<PokemonApiResponse[]>
+        ) => {
+            const tempData = JSON.parse(JSON.stringify(state.allPokemons));
+            state.allPokemons = [...tempData, ...action.payload];
         },
         editPokemon: (state, action: PayloadAction<PokemonApiResponse>) => {
-            const pokemonlist: any = state.allPokemons?.find(
-                (item) => item.page === Number(state.currentPage)
-            )?.data;
-
-            const tempList = pokemonlist.map((pokemon: PokemonApiResponse) => {
-                if (pokemon.id === action.payload.id) {
-                    return action.payload;
+            const tempList = state.allPokemons.map(
+                (pokemon: PokemonApiResponse) => {
+                    if (pokemon.id === action.payload.id) {
+                        return action.payload;
+                    }
+                    return pokemon;
                 }
-                return pokemon;
-            });
+            );
 
-            state.allPokemons = state.allPokemons.map((listOfPokemons: any) => {
-                if (listOfPokemons.page === state.currentPage) {
-                    const tempData = {
-                        page: state.currentPage,
-                        data: tempList,
-                    };
-                    return tempData;
+            state.allPokemons = tempList;
+        },
+        addPokemon: (state, action: PayloadAction<PokemonApiResponse>) => {
+            const tempList = state.allPokemons.map(
+                (pokemon: PokemonApiResponse) => {
+                    if (pokemon.id === action.payload.id) {
+                        return action.payload;
+                    }
+                    return pokemon;
                 }
-                return listOfPokemons;
-            });
+            );
+
+            tempList.unshift(action.payload);
+            state.allPokemons = tempList;
         },
         deletePokemonAction: (state, action: PayloadAction<number>) => {
-            const pokemonlist: any = state.allPokemons?.find(
-                (item) => item.page === Number(state.currentPage)
-            )?.data;
+            const tempList: PokemonApiResponse[] = JSON.parse(
+                JSON.stringify(state.allPokemons)
+            );
 
-            const indexFound = pokemonlist.findIndex(
+            const indexFound = state.allPokemons.findIndex(
                 (pokemon: PokemonApiResponse) => pokemon.id === action.payload
             );
 
-            pokemonlist.splice(indexFound, 1);
+            tempList.splice(indexFound, 1);
 
-            state.allPokemons = state.allPokemons.map((listOfPokemons: any) => {
-                if (listOfPokemons.page === state.currentPage) {
-                    return { page: state.currentPage, data: pokemonlist };
-                }
-                return listOfPokemons;
-            });
+            state.allPokemons = tempList;
+        },
+        sortPokemons: (state, action: PayloadAction<PokemonApiResponse[]>) => {
+            state.allPokemons = [...action.payload];
         },
     },
 });
@@ -86,6 +87,8 @@ export const {
     editPokemon,
     deletePokemonAction,
     listOfPokemons,
+    addPokemon,
+    sortPokemons,
 } = pokemonSlice.actions;
 
 export default pokemonSlice.reducer;

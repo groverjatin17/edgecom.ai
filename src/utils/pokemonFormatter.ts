@@ -17,3 +17,7 @@ export async function getAllPokemon(url: string) {
       });
   });
 }
+
+export const sliceData = (data: any, page: number, rowsPerPage: number) => {
+  return data.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+};

@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Ability, PokemonApiResponse } from '../types/PokemonType';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { Avatar, Chip, Skeleton, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -17,10 +17,16 @@ import { Box, styled } from '@mui/system';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import _ from 'lodash';
+import { sortPokemons } from '../redux/pokemonSlice';
+import { sliceData } from '../utils/pokemonFormatter';
 
 const fetchAbilities = (abilities: Ability[]) => {
     return abilities.map((item: Ability) => (
-        <Chip label={item.ability.name} variant="outlined" key={item.ability.name}/>
+        <Chip
+            label={item.ability.name}
+            variant="outlined"
+            key={item.ability.name}
+        />
     ));
 };
 
@@ -38,53 +44,36 @@ const Cell = styled(TableCell)({
 });
 
 export default function PokemonTable({ loading }: { loading: boolean }) {
-    const currentPage = useSelector(
-        (state: RootState) => state.pokemonReducer.currentPage
-    );
-    const allPokemons = useSelector(
-        (state: RootState) => state.pokemonReducer.allPokemons
+    const { currentPage, allPokemons, pageSize, searchString } = useSelector(
+
+        (state: RootState) => state.pokemonReducer
     );
 
-    const pokemonlist: PokemonApiResponse[] | undefined = allPokemons.find(
-        (item) => item.page === Number(currentPage)
-    )?.data;
-
+    const dispatch = useDispatch();
     const [deletePokemon, setDeletePokemon] = React.useState(0);
-    const [listOfPokemon, setListOfPokemon] = React.useState(pokemonlist);
     const [sortingOrder, setSortingOrder] = React.useState('asc');
-
     const [open, setOpen] = React.useState(false);
+    
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const pageSize = useSelector(
-        (state: RootState) => state.pokemonReducer.pageSize
-    );
-
-    const searchString = useSelector(
-        (state: RootState) => state.pokemonReducer.searchString
-    );
-
-    React.useEffect(() => {
-        let formatPokemons = pokemonlist?.filter((pokemon) =>
-            pokemon.name.includes(searchString)
-        );
-        setListOfPokemon(formatPokemons);
-    }, [searchString, pokemonlist]);
-
-    React.useEffect(() => {
-        const isAsc = sortingOrder === 'asc';
-
-        let tempPokemons = _.cloneDeep(listOfPokemon);
-        const sortedPokemons = isAsc
-            ? tempPokemons?.sort((a, b) => a.weight - b.weight)
-            : tempPokemons?.sort((a, b) => b.weight - a.weight);
-        setListOfPokemon(sortedPokemons);
-    }, [sortingOrder]);
 
     const sortIt = () => {
         const isAsc = sortingOrder === 'asc';
+        const tempPokemons: PokemonApiResponse[] = JSON.parse(
+            JSON.stringify(allPokemons)
+        );
+
+        const sortedPokemons = isAsc
+            ? tempPokemons?.sort((a, b) => a.weight - b.weight)
+            : tempPokemons?.sort((a, b) => b.weight - a.weight);
+
+        dispatch(sortPokemons(sortedPokemons));
         setSortingOrder(isAsc ? 'desc' : 'asc');
     };
+
+    let formatedPokemons = allPokemons?.filter((item) =>
+    item?.name?.includes(searchString)
+    );
 
     return (
         <React.Fragment>
@@ -149,11 +138,11 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                                           {Array.from(
                                               { length: 7 },
                                               (x, i) => i
-                                          ).map((row) => (
+                                          ).map((column) => (
                                               <Cell
                                                   component="th"
                                                   scope="row"
-                                                  key={row}
+                                                  key={column}
                                               >
                                                   <Skeleton
                                                       variant="rectangular"
@@ -165,7 +154,11 @@ export default function PokemonTable({ loading }: { loading: boolean }) {
                                       </TableRow>
                                   )
                               )
-                            : listOfPokemon?.map((row: PokemonApiResponse) => (
+                            : sliceData(
+                                  formatedPokemons,
+                                  currentPage,
+                                  pageSize
+                              )?.map((row: PokemonApiResponse) => (
                                   <TableRow key={row.id}>
                                       <Cell component="th" scope="row">
                                           {row.id}

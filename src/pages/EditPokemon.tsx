@@ -23,19 +23,12 @@ export default function EditPokemon() {
         useState<PokemonApiResponse>();
     const [navigateToHome, setNavigateToHome] = useState<boolean>(false);
     const dispatch = useDispatch();
-    const currentPage = useSelector(
-        (state: RootState) => state.pokemonReducer.currentPage
-    );
     const allPokemons = useSelector(
         (state: RootState) => state.pokemonReducer.allPokemons
     );
 
-    const pokemonlist: any = allPokemons.find(
-        (item) => item.page === Number(currentPage)
-    )?.data;
-
     useEffect(() => {
-        const pokemon: any = pokemonlist?.find(
+        const pokemon: any = allPokemons?.find(
             (pokemon: PokemonApiResponse) => pokemon.id === Number(pokemonId)
         );
         setSelectedPokemon(pokemon);
@@ -115,19 +108,6 @@ export default function EditPokemon() {
                                 type="text"
                                 variant="standard"
                                 value={selectedPokemon?.weight}
-                                onChange={(e) => {
-                                    handleChange(e);
-                                }}
-                            />
-                            <TextField
-                                id="abilities"
-                                name="abilities"
-                                label="Abilities"
-                                type="text"
-                                value={selectedPokemon?.abilities
-                                    .map((item: Ability) => item.ability.name)
-                                    ?.toString()}
-                                variant="standard"
                                 onChange={(e) => {
                                     handleChange(e);
                                 }}

@@ -32,6 +32,7 @@ export default function Pagination() {
                         backgroundColor: 'lightgrey',
                         margin: 2,
                     }}
+                    disabled={currentPage === 1}
                 >
                     <NavigateBeforeIcon />
                 </IconButton>

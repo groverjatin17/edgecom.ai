@@ -5,21 +5,23 @@ import { listOfPokemons } from '../redux/pokemonSlice';
 import { PokemonType } from '../types/PokemonType';
 import Table from './Table';
 import { RootState } from '../redux/store';
-
 import { Box } from '@mui/material';
 import Pagination from './Pagination';
+
 export default function PokemonTableContainer() {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const currentPage = useSelector(
         (state: RootState) => state.pokemonReducer.currentPage
     );
+
     const pageSize = useSelector(
         (state: RootState) => state.pokemonReducer.pageSize
     );
     const allPokemons = useSelector(
         (state: RootState) => state.pokemonReducer.allPokemons
     );
+
     const fetchPokemonProfile = async (data: PokemonType[]) => {
         let result: any = await Promise.all(
             data.map(async (pokemon: PokemonType) => {
@@ -29,28 +31,29 @@ export default function PokemonTableContainer() {
         );
 
         if (result) {
-            dispatch(listOfPokemons({ page: currentPage, data: result }));
+            dispatch(listOfPokemons(result));
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        const page: any = allPokemons.find(
-            (item) => item.page === Number(currentPage)
+    const calculateTotalPages = allPokemons.length / pageSize;
+    async function fetchData() {
+        let response: any = await getAllPokemon(
+            `https://pokeapi.co/api/v2/pokemon/?limit=${pageSize}&offset=${
+                (currentPage - 1) * pageSize
+            }`
         );
-        async function fetchData() {
-            let response: any = await getAllPokemon(
-                `https://pokeapi.co/api/v2/pokemon/?limit=${pageSize}&offset=${
-                    currentPage * pageSize
-                }`
-            );
-            await fetchPokemonProfile(response.results);
-        }
-        if (!page) {
+
+        await fetchPokemonProfile(response.results);
+    }
+
+    useEffect(() => {
+        if (currentPage > calculateTotalPages) {
             setLoading(true);
+
             fetchData();
         }
-    }, [currentPage, pageSize]);
+    }, [currentPage]);
 
     return (
         <Fragment>
@@ -63,7 +66,6 @@ export default function PokemonTableContainer() {
                 <Table loading={loading} />
             </Box>
             <Pagination />
-
         </Fragment>
     );
 }
