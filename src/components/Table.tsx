@@ -20,7 +20,7 @@ import _ from 'lodash';
 
 const fetchAbilities = (abilities: Ability[]) => {
     return abilities.map((item: Ability) => (
-        <Chip label={item.ability.name} variant="outlined" />
+        <Chip label={item.ability.name} variant="outlined" key={item.ability.name}/>
     ));
 };
 

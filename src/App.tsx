@@ -9,8 +9,6 @@ import { setSearchString } from './redux/pokemonSlice';
 import { RootState } from './redux/store';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 
 const App: React.FunctionComponent = () => {
     const dispatch = useDispatch();
@@ -26,76 +24,65 @@ const App: React.FunctionComponent = () => {
     };
     const isMobile = window.innerWidth < 786;
 
-    const theme = createTheme({
-        palette: {
-            mode: currentTheme,
-        },
-    });
-
     return (
         <AuthenticationHOC>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <div>
+            <div>
+                <Box
+                    component="div"
+                    sx={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'space-between',
+                        margin: '20px 30px 0 40px',
+                    }}
+                >
+                    <TextField
+                        id="search"
+                        label="Search"
+                        variant="standard"
+                        name="search"
+                        value={searchString}
+                        onChange={(e) => {
+                            handleSearch(e);
+                        }}
+                    />
                     <Box
                         component="div"
                         sx={{
                             display: 'flex',
-                            flexDirection: isMobile ? 'column' : 'row',
-                            justifyContent: 'space-between',
-                            margin: '20px 30px 0 40px',
+                            justifyContent: isMobile ? 'space-between' : 'end',
+                            margin: '20px 30px 0 0',
                         }}
                     >
-                        <TextField
-                            id="search"
-                            label="Search"
-                            variant="standard"
-                            name="search"
-                            value={searchString}
-                            onChange={(e) => {
-                                handleSearch(e);
-                            }}
-                        />
-                        <Box
-                            component="div"
-                            sx={{
-                                display: 'flex',
-                                justifyContent: isMobile
-                                    ? 'space-between'
-                                    : 'end',
-                                margin: '20px 30px 0 0',
+                        <IconButton
+                            sx={{ ml: 1 }}
+                            onClick={() => dispatch(toggleCurrentMode())}
+                            color="inherit"
+                        >
+                            {currentTheme === 'dark' ? (
+                                <Brightness7Icon />
+                            ) : (
+                                <Brightness4Icon />
+                            )}
+                        </IconButton>
+                        <Button
+                            onClick={() => {
+                                navigate('/addPokemon');
                             }}
                         >
-                            <IconButton
-                                sx={{ ml: 1 }}
-                                onClick={() => dispatch(toggleCurrentMode())}
-                                color="inherit"
-                            >
-                                {currentTheme === 'dark' ? (
-                                    <Brightness7Icon />
-                                ) : (
-                                    <Brightness4Icon />
-                                )}
-                            </IconButton>
-                            <Button
-                                onClick={() => {
-                                    navigate('/addPokemon');
-                                }}
-                            >
-                                Add Pokemon
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    dispatch(toggleUserStatus());
-                                }}
-                            >
-                                Sign Out
-                            </Button>
-                        </Box>
+                            Add Pokemon
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                dispatch(toggleUserStatus());
+                            }}
+                        >
+                            Sign Out
+                        </Button>
                     </Box>
-                    <PokemonTableContainer />
-                </div>
-            </ThemeProvider>
+                </Box>
+                <PokemonTableContainer />
+            </div>
         </AuthenticationHOC>
     );
 };

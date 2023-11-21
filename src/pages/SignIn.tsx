@@ -16,8 +16,6 @@ import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 
-const theme = createTheme();
-
 type FormValues = {
     email: string;
     password: string;
@@ -65,7 +63,7 @@ export default function SignIn() {
     };
 
     return (
-        <ThemeProvider theme={theme}>
+        <>
             <LoadingBackdrop isOpen={isLoading} />
 
             <Container component="main" maxWidth="xs">
@@ -149,11 +147,13 @@ export default function SignIn() {
                             }}
                         >
                             {"Don't have an account? "} &nbsp;
-                            <Link to="/signUp">Register</Link>
+                            <Link to="/signUp">
+                                <Button variant="text">Register</Button>
+                            </Link>
                         </Box>
                     </Box>
                 </Box>
             </Container>
-        </ThemeProvider>
+        </>
     );
 }

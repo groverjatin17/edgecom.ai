@@ -124,7 +124,6 @@ export default function EditPokemon() {
                                 name="abilities"
                                 label="Abilities"
                                 type="text"
-                                defaultValue=""
                                 value={selectedPokemon?.abilities
                                     .map((item: Ability) => item.ability.name)
                                     ?.toString()}
